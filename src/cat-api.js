@@ -1,4 +1,5 @@
 import axios from 'axios';
+import Notiflix from 'notiflix';
 
 axios.defaults.headers.common['x-api-key'] =
   'live_AX2Z5jVqgL19RjuTQ3itfEYHiVdpuccx2TY8sY6fC4IwG8P4xkAULfVzqWMSsEgx';
@@ -10,9 +11,8 @@ export function fetchBreeds() {
     .get(`${API_URL}/breeds`)
     .then(response => response.data)
     .catch(error => {
-      console.error(
-        'Oops! Something went wrong! Try reloading the page!',
-        error
+      Notiflix.Notify.failure(
+        'Oops! Something went wrong! Try reloading the page!'
       );
       throw error;
     });
@@ -25,9 +25,8 @@ export function fetchCatByBreed(breedId) {
       return response.data;
     })
     .catch(error => {
-      console.error(
-        'Oops! Something went wrong! Try reloading the page!',
-        error
+      Notiflix.Notify.failure(
+        'Oops! Something went wrong! Try reloading the page!'
       );
       throw error;
     });

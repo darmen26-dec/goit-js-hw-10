@@ -6,37 +6,40 @@ import Notiflix from 'notiflix';
 
 const breedSelector = document.querySelector('.breed-select');
 const catInfo = document.querySelector('.cat-info');
-// const pageLoader = document.querySelector('.loader');
-// const pageError = document.querySelector('.error');
 
 function showError(errorMessage) {
   Notiflix.Notify.failure(errorMessage);
 }
 
 function showLoader() {
-  Notiflix.Loading.standard('Loading data, please wait...', {
+  Notiflix.Loading.hourglass('Loading data, please wait...', {
     overlay: breedSelector,
   });
 }
 
 function hideLoader() {
-  Notiflix.Notify.remove(breedSelector); // usuń komunikat o ładowaniu danych
+  Notiflix.Loading.remove(); // usuń komunikat o ładowaniu danych
 }
 
-fetchBreeds()
-  .then(breeds => {
-    const breedSelect = document.querySelector('.breed-select');
-    new SlimSelect({
-      select: breedSelect,
-      data: breeds.map(breed => ({
-        text: breed.name,
-        value: breed.id,
-      })),
+function onLoad() {
+  fetchBreeds()
+    .then(breeds => {
+      const breedSelect = document.querySelector('.breed-select');
+      new SlimSelect({
+        select: breedSelect,
+        data: breeds.map(breed => ({
+          text: breed.name,
+          value: breed.id,
+        })),
+      });
+    })
+    .catch(error => {
+      showError('Oops! Something went wrong! Try reloading the page!');
+      hideLoader();
     });
-  })
-  .catch(error => {
-    showError('Oops! Something went wrong! Try reloading the page!');
-  });
+}
+
+document.addEventListener('DOMContentLoaded', onLoad);
 
 breedSelector.addEventListener('change', onSelectBreed); // kiedy użytkownik wybierze rasę, zostanie wywołana funkcja onSelectBreed
 
@@ -44,12 +47,13 @@ function onSelectBreed(event) {
   const breedId = event.target.value;
   breedSelector.disabled = true;
 
-  hideLoader();
+  showLoader();
 
   fetchCatByBreed(breedId)
     .then(data => {
       const { url, breeds } = data[0];
       breedSelector.disabled = false;
+      hideLoader();
 
       catInfo.innerHTML = `
         <img src="${url}" alt="${breeds[0].name}">
@@ -71,5 +75,6 @@ function onSelectBreed(event) {
       } else {
         showError('Oops! Something went wrong! Try reloading the page!');
       }
+      hideLoader();
     });
 }
